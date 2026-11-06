@@ -1,0 +1,45 @@
+/*
+ * Custom styles for this fork, kept separate from the upstream
+ * TryGhost/Source styles so upstream updates stay conflict-free.
+ *
+ * Inlined into assets/built/screen.css by the build (pnpm zip /
+ * pnpm build): screen.css imports this file via postcss-easy-import.
+ */
+
+/* Custom headings (site-wide) */
+h2 {
+    color: var(--ghost-accent-color);
+    border-bottom: 5px solid;
+    border-image: linear-gradient(to right, color-mix(in srgb, var(--ghost-accent-color) 20%, transparent), transparent) 1;
+    padding-top: 50px;
+}
+
+/* Bandeau infos pratiques (accueil) */
+.home-infos .gh-container-inner {
+    display: block; /* neutralise la grille du thème → carte pleine largeur */
+}
+
+.home-infos .home-infos-card {
+    background: var(--ghost-accent-color);
+    color: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    margin-top: 4px;
+}
+
+.home-infos .home-infos-card p {
+    color: inherit;
+    font-size: 1.7rem;
+    line-height: 1.55;
+    white-space: pre-line;
+    margin: 0;
+}
+
+.home-infos .home-infos-card a {
+    display: inline-block;
+    margin-top: 14px;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}

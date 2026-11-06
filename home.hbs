@@ -1,6 +1,24 @@
 {{!< default}}
 {{!-- The tag above means: insert everything in this file into the body of the default.hbs template --}}
 
+{{!-- QUENTIN CUSTOM --}}
+{{#get "pages" filter="slug:infos" limit="1" as |infosPage|}}
+  {{#foreach infosPage}}
+    <section class="gh-container is-list gh-outer home-infos">
+      <div class="gh-container-inner gh-inner">
+        <h2 class="gh-container-title">Infos pratiques</h2>
+        <div class="home-infos-card">
+          <p>{{excerpt}}</p>
+          <a href="{{url}}">Voir les infos pratiques →</a>
+        </div>
+      </div>
+    </section>
+  {{/foreach}}
+{{/get}}
+
+{{!-- Styles for this section live in assets/css/custom.css (home-infos) --}}
+{{!-- QUENTIN CUSTOM FIN --}}
+
 {{> "components/header" headerStyle=@custom.header_style}}
 
 {{#match @custom.header_style "Magazine"}}
