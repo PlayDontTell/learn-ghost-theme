@@ -1,0 +1,39 @@
+name: CI
+
+# Validates builds on PRs and on pushes to any branch other than main
+# (main is covered by the Deploy Theme workflow)
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build & validate theme
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        # Version comes from the packageManager field in package.json
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build theme
+        run: pnpm zip
+
+      - name: Validate theme
+        run: pnpm test:ci

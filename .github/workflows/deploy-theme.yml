@@ -1,0 +1,65 @@
+name: Deploy Theme
+
+# Deploys the theme to Ghost on every push to main, using the official
+# Ghost action (https://ghost.org/integrations/github/). Can also be run
+# manually from the Actions tab.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Only the latest commit needs to be deployed
+concurrency:
+  group: deploy-theme
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & deploy theme to Ghost
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        # Version comes from the packageManager field in package.json
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build theme
+        # Regenerates assets/built/ from sources and zips the theme into
+        # dist/<theme-name>.zip
+        run: pnpm zip
+
+      - name: Validate theme
+        # gscan --fatal: fails the deployment on any theme validation error
+        run: pnpm test:ci
+
+      - name: Resolve theme name
+        # gulp names the zip after the "name" field in package.json, so derive
+        # the path from it here too. Note: Ghost rejects uploads named after
+        # default themes (casper, source), hence the custom name.
+        run: echo "THEME_NAME=$(node -p "require('./package.json').name")" >> "$GITHUB_ENV"
+
+      - name: Deploy to Ghost
+        # Requires repository secrets GHOST_ADMIN_API_URL and
+        # GHOST_ADMIN_API_KEY (Ghost Admin → Integrations → GitHub Actions)
+        uses: TryGhost/action-deploy-theme@v2
+        with:
+          api-url: ${{ secrets.GHOST_ADMIN_API_URL }}
+          api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
+          # Upload the zip built in the previous step instead of letting the
+          # action package the repo itself (keeps the build pnpm-based)
+          file: dist/${{ env.THEME_NAME }}.zip
